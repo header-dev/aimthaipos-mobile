@@ -1,0 +1,32 @@
+{
+  "expo": {
+    "name": "aimthaipos",
+    "slug": "aimthaipos",
+    "version": "1.0.0",
+    "sdkVersion": "44.0.0",
+    "platforms": [
+      "ios",
+      "android",
+      "web"
+    ],
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff"
+    },
+    "updates": {
+      "fallbackToCacheTimeout": 0
+    },
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.hanumandev.aimthaipos",
+      "requireFullScreen": true
+    },
+    "android": {
+      "package": "com.hanumandev.aimthaipos"
+    }
+  }
+}
