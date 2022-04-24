@@ -9,26 +9,29 @@ import { Context as ProteinContext } from "./../../context/ProteinContext";
 import { NavigationEvents, withNavigation } from "react-navigation";
 import { BACKEND_URL, MENU_IMAGE } from "./../../constants";
 import _ from "lodash";
-import { MaterialIcons } from "@expo/vector-icons";
-import { priceNumberFormat } from "./../../utils/NumberUtil";
+import { AntDesign, MaterialIcons } from "@expo/vector-icons";
 import { navigate } from "../../navigationRef";
-import { Button, Icon, Badge } from "react-native-elements";
+import { Button, Icon, Badge, Card } from "react-native-elements";
 import { TouchableOpacity, Dimensions, ActivityIndicator } from "react-native";
 import { ScrollableTab, Tab, Tabs, Toast, Header as NativeHeader } from "native-base";
-import { truncate } from "../../utils/FormatObjectUtil";
 import { FlatGrid } from 'react-native-super-grid';
-import { TouchableWithoutFeedback } from "react-native";
 import currency from 'currency.js'
 import ItemQuantityModal from "../../components/sales/ItemQuantityModal";
+import { Dropdown } from 'react-native-element-dropdown';
 
 const SaleScreen = ({ navigation }) => {
 
-  const [category, setCategory] = useState("ALL");
+  const [category, setCategory] = useState({
+    id: 1,
+    name: "Favorite"
+  });
   const [menu, setMenu] = useState("ALL");
   const [segmentActive, setSegmentActive] = useState(0);
   const [showQuntityModal, setShowQuntityModal] = useState(false)
   const [selectedProduct, setSelectedProduct] = useState(null)
   const [headerTitle, setHeaderTitle] = useState(``)
+  const [value, setValue] = useState(null);
+  const [isFocus, setIsFocus] = useState(false);
 
   const {
     state: { categories },
@@ -133,101 +136,120 @@ const SaleScreen = ({ navigation }) => {
         lightTheme
         onChangeText={(search) => {
           fetchMenuSale(
-            category === "Favorite" ? 1 : 0,
+            category.id,
             search ? search : "ALL",
-            category
+            category.name
           );
           setMenu(search ? search : "ALL");
         }}
         value={menu === "ALL" ? "" : menu}
       />
-      <SegmentedControl
-        values={["Favorite", ...categories.map((i) => i.name)]}
-        selectedIndex={segmentActive}
-        onChange={(event) => {
-          setSegmentActive(event.nativeEvent.selectedSegmentIndex);
-        }}
-        onValueChange={(value) => {
-          setCategory(value);
-          let [cat] = _.filter(categories, { name: value })
-          fetchMenuSale(value === "Favorite" ? 1 : 0, menu, value !== "Favorite" ? cat.id : "Favorite");
-        }}
-      />
-      {isLoading && <ActivityIndicator style={{ marginTop: 10 }} />}
-      <FlatGrid
-        itemDimension={130}
-        data={menus}
-        renderItem={({ item }) => (
-          <View
-            key={item.id}
-            style={{
-              flexDirection: "column",
-              margin: 4,
-              borderColor: "grey",
-              borderWidth: 0.5,
+      <Card containerStyle={{
+        flex: 1,
+        paddingBottom: 55
+      }}>
+        <View style={styles.sectionCategories}>
+          <Text style={styles.textCap}>
+            Categories
+          </Text>
+          <Dropdown
+            style={[styles.dropdown, isFocus && { borderColor: 'blue' }]}
+            placeholderStyle={styles.placeholderStyle}
+            selectedTextStyle={styles.selectedTextStyle}
+            inputSearchStyle={styles.inputSearchStyle}
+            iconStyle={styles.iconStyle}
+            data={[...categories, { id: 1, name: 'Favorite' }]}
+            maxHeight={300}
+            labelField="name"
+            valueField="id"
+            placeholder={!isFocus ? 'Select Category' : '...'}
+            searchPlaceholder="Search..."
+            value={category.id}
+            onFocus={() => setIsFocus(true)}
+            onBlur={() => setIsFocus(false)}
+            onChange={async item => {
+              await fetchMenuSale(category.id, menu, category.name !== "Favorite" ? category.id : "Favorite");
+              setCategory({
+                id: item.id,
+                name: item.name
+              })
+              setIsFocus(false);
             }}
-          >
-            <TouchableOpacity
-              onPress={() => {
-                if (currentOrder.orderStatus !== "closed") {
-                  setSelectedProduct(item)
-                  setShowQuntityModal(true)
-                } else {
-                  Toast.show({
-                    text: "This order has been closed.",
-                    position: "top",
-                    type: "warning"
-                  })
-                }
-              }}>
-              <Image
-                style={styles.imageThumbnail}
-                resizeMode="cover"
-                resizeMethod="resize"
-                source={{ uri: `${MENU_IMAGE}${item.photo}` }}
-                transition={false}
-                PlaceholderContent={<ActivityIndicator />}
+            renderLeftIcon={() => (
+              <AntDesign
+                style={styles.icon}
+                color={isFocus ? 'blue' : 'black'}
+                name="Safety"
+                size={20}
               />
-            </TouchableOpacity>
-            <View style={styles.footerCard}>
-              <View style={{ flexDirection: "row" }}>
-                <Tooltip popover={<Text>{item.name}</Text>}>
-                  <MaterialIcons name="food-bank" size={22} color="green" />
-                </Tooltip>
-                <Text style={styles.textCard}>{truncate(item.name, 10)}</Text>
-              </View>
-              <View
+            )}
+          />
+        </View>
+        <FlatGrid
+          itemDimension={130}
+          data={menus}
+          renderItem={({ item }) => (
+            <View
+              key={item.id}
+              style={styles.prodCardContent}
+            >
+              <TouchableOpacity
+                onPress={() => {
+                  if (currentOrder.orderStatus !== "closed") {
+                    setSelectedProduct(item)
+                    setShowQuntityModal(true)
+                  } else {
+                    Toast.show({
+                      text: "This order has been closed.",
+                      position: "top",
+                      type: "warning"
+                    })
+                  }
+                }}>
+                <Image
+                  style={styles.imageThumbnail}
+                  resizeMode="cover"
+                  resizeMethod="resize"
+                  source={{ uri: `${MENU_IMAGE}${item.photo}` }}
+                  transition={false}
+                  PlaceholderContent={<ActivityIndicator />}
+                />
+              </TouchableOpacity>
+              <TouchableOpacity
                 style={{
-                  flexDirection: "row",
-                  justifyContent: "space-between",
+                  position: 'absolute',
+                  top: 2,
+                  left: 2
+                }}
+                onPress={() => {
+                  saveFavorite(item.id, item.favorite);
+                  fetchMenuSale(
+                    category.id,
+                    menu,
+                    category.name !== "Favorite" ? category.id : category.name
+                  );
                 }}
               >
-                <Text style={styles.textCard}>
-                  {currentOrder.orderType === "partner" ? currency(item.specialPrice, { separator: ',' }).format() : currency(item.price, { separator: ',' }).format()}
-                </Text>
                 <MaterialIcons
                   name={item.favorite === 1 ? "favorite" : "favorite-outline"}
-                  size={20}
+                  size={30}
                   color={item.favorite === 1 ? "orange" : "black"}
-                  onPress={() => {
-                    saveFavorite(item.id, item.favorite);
-                    fetchMenuSale(
-                      category === "Favorite" ? 1 : 0,
-                      menu,
-                      category
-                    );
-                  }}
                 />
+              </TouchableOpacity>
+              <View style={styles.footerCard}>
+                <Text style={styles.textProductName}>{item.name}</Text>
+                <Text style={styles.textPrice}>
+                  {currentOrder.orderType === "partner" ? currency(item.specialPrice, { separator: ',' }).format() : currency(item.price, { separator: ',' }).format()}
+                </Text>
               </View>
             </View>
-          </View>
-        )}
-        spacing={4}
-        style={{
-          flex: 1,
-          marginTop: 10
-        }}
-      />
+          )}
+          spacing={4}
+          style={{
+            marginTop: 10,
+          }}
+        />
+      </Card>
       <ItemQuantityModal
         showModal={showQuntityModal}
         handleClose={() => {
@@ -239,11 +261,7 @@ const SaleScreen = ({ navigation }) => {
           const { id, name, price, specialPrice, type, category } = selectedProduct
 
           let makeToTakeAway = false
-          
-          /**if (currentOrder.orderType === 'take-away' && category.name !== "Lunch Special") {
-            makeToTakeAway = true
-          }**/
-          
+
           if (currentOrder.orderType === 'take-away') {
             makeToTakeAway = true
           }
@@ -296,6 +314,27 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "white",
   },
+  sectionCategories: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  textCap: {
+    fontSize: 18,
+    fontWeight: "bold",
+    marginEnd: 4,
+  },
+  textProductName: {
+    textAlign: 'center',
+    marginBottom: 4
+  },
+  textPrice: {
+    textAlign: 'center'
+  },
+  prodCardContent: {
+    flexDirection: "column",
+    margin: 4,
+    minHeight: 180,
+  },
   contentGrid: {
     padding: 2,
   },
@@ -312,6 +351,41 @@ const styles = StyleSheet.create({
   },
   footerCard: {
     margin: 2,
+  },
+  dropdown: {
+    height: 50,
+    borderColor: 'gray',
+    borderWidth: 0.5,
+    borderRadius: 8,
+    paddingHorizontal: 8,
+    width: "auto",
+    minWidth: 200
+  },
+  icon: {
+    marginRight: 5,
+  },
+  label: {
+    position: 'absolute',
+    backgroundColor: 'white',
+    left: 22,
+    top: 8,
+    zIndex: 999,
+    paddingHorizontal: 8,
+    fontSize: 14,
+  },
+  placeholderStyle: {
+    fontSize: 16,
+  },
+  selectedTextStyle: {
+    fontSize: 16,
+  },
+  iconStyle: {
+    width: 20,
+    height: 20,
+  },
+  inputSearchStyle: {
+    height: 40,
+    fontSize: 16,
   },
 });
 
