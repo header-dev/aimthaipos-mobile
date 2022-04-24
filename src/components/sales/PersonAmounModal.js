@@ -99,11 +99,8 @@ const PersonAmounModal = ({ showModal, handleClose, onSubmit }) => {
                       </Pressable>
                       <Divider
                         style={{
-                          backgroundColor: "black",
-                          width: 30,
-                          marginBottom: 10,
-                          bottom: -20,
-                          transform: [{ rotate: "90deg" }],
+                          backgroundColor: "grey",
+                          width: 1,
                         }}
                       />
                       <Pressable
