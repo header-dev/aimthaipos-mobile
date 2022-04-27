@@ -1,7 +1,6 @@
-export const BACKEND_URL = 'https://apidev.aim-thai.com'
-// export const BACKEND_URL = 'https://aim-thai.com'
+// export const BACKEND_URL = 'https://apidev.aim-thai.com'
+export const BACKEND_URL = 'https://aim-thai.com'
 export const MENU_IMAGE = 'https://aim-thai.com/api/ver1/image/menus/'
-// export const MENU_IMAGE = 'https://apidev.aim-thai.com/image/menus/'
 
 export const TXT_DOUBLE = '\x1b\x21\x30'
 export const TXT_DOUBLE_OFF = '\x1b\x21\x00'

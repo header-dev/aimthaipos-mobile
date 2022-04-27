@@ -41,7 +41,7 @@ const DailySaleReportScreen = ({ navigation }) => {
                     _.sumBy(i.orderDetails, "totalAmount"))
                 -
                 i.promotionAmount
-                + i.tip
+                + i.tip + i.diffRoundup
 
             return {
                 actualPay: i.orderType === "partner" ? Number(actualPayTotal - (actualPayTotal * (Number(i.partner.percentage) / 100))) : i.paymentType === "card" ? Number(actualPayTotal - (actualPayTotal * (i.cardCharge / 100))) : actualPayTotal,
@@ -51,8 +51,6 @@ const DailySaleReportScreen = ({ navigation }) => {
 
         const data = _.map(_.groupBy(recalculate, 'paymentType'),
             (o, idx) => {
-
-
                 return {
                     name: idx ? idx : "N/A",
                     totalAmount: parseFloat(parseFloat(_.sumBy(o, 'actualPay')).toFixed(2)),
@@ -128,7 +126,6 @@ const DailySaleReportScreen = ({ navigation }) => {
             <ListItem.Content>
                 <ListItem.Title style={styles.titleItem}>Sale Amount</ListItem.Title>
                 <ListItem.Subtitle style={styles.subTitle}>
-                    {/* {currency(item.actualPay, { separator: "," }).format()} */}
                     {currency(_.sumBy(item.orderDetails, "totalAmount") +
                         (item.serviceCharge / 100) *
                         _.sumBy(item.orderDetails, "totalAmount") +
@@ -136,7 +133,7 @@ const DailySaleReportScreen = ({ navigation }) => {
                             _.sumBy(item.orderDetails, "totalAmount"))
                         -
                         item.promotionAmount
-                        + item.tip, { separator: "," }).format()}
+                        + item.tip + item.diffRoundup, { separator: "," }).format()}
                 </ListItem.Subtitle>
             </ListItem.Content>
             <ListItem.Content>

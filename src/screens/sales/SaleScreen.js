@@ -185,6 +185,7 @@ const SaleScreen = ({ navigation }) => {
             )}
           />
         </View>
+        {isLoading && <ActivityIndicator />}
         <FlatGrid
           itemDimension={130}
           data={menus}

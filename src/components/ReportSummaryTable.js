@@ -11,8 +11,6 @@ export default function ReportSummaryTable({
 
     const recalculate = data.map(i => {
         return {
-            // actualPay: i.orderType === "partner" ? Number(i.actualPay - (i.actualPay * (Number(i.partner.percentage) / 100))) : i.paymentType === "card" ? Number(i.actualPay - (i.actualPay * (i.cardCharge / 100))) : i.actualPay,
-            // actualPay: i.actualPay,
             actualPay: _.sumBy(i.orderDetails, "totalAmount") +
                 (i.serviceCharge / 100) *
                 _.sumBy(i.orderDetails, "totalAmount") +
@@ -20,18 +18,15 @@ export default function ReportSummaryTable({
                     _.sumBy(i.orderDetails, "totalAmount"))
                 -
                 i.promotionAmount
-                + i.tip,
+                + i.tip + i.diffRoundup,
             paymentType: i.paymentType,
             orderType: i.orderType
         }
     })
 
     const dineInValue = _.filter(recalculate, { orderType: 'dine-in' })
-
     const takeAwayValue = _.filter(recalculate, { orderType: 'take-away' })
-
     const deliveryValue = _.filter(recalculate, { orderType: 'delivery' })
-
     const partnerValue = _.filter(recalculate, { orderType: 'partner' })
 
     const cashDineInValue = _.filter(dineInValue, { paymentType: 'cash' })
@@ -51,18 +46,7 @@ export default function ReportSummaryTable({
     const takeAwayDeliveryValue = _.filter(deliveryValue, { paymentType: 'take-away' })
 
     const partnerPartnerValue = _.filter(partnerValue, { paymentType: 'partner' })
-
-    // const sumCashDineInValue = _.sumBy(cashDineInValue, 'actualPay') 
     const sumCashDineInValue = _.sumBy(cashDineInValue, 'actualPay')
-    console.log(cashDineInValue);
-    // const sumCashDineInValue = (_.sumBy(cashDineInValue.orderDetails, "totalAmount") +
-    //     (cashDineInValue.serviceCharge / 100) *
-    //     _.sumBy(cashDineInValue.orderDetails, "totalAmount") +
-    //     ((cashDineInValue.cardCharge / 100) *
-    //         _.sumBy(cashDineInValue.orderDetails, "totalAmount"))
-    //     -
-    //     cashDineInValue.promotionAmount
-    //     + cashDineInValue.tip)
 
     const sumPayIdDineInValue = _.sumBy(payIdDineInValue, 'actualPay')
     const sumCardDineInValue = _.sumBy(cardDineInValue, 'actualPay')
