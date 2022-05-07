@@ -1,6 +1,7 @@
 import React from "react";
 import { FlatList, View, Text, StyleSheet } from "react-native";
 import { Header, Icon, ListItem } from "react-native-elements";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 const SettingScreen = ({ navigation }) => {
 
@@ -70,6 +71,7 @@ const SettingScreen = ({ navigation }) => {
     },
     {
       title: "Printer Preferences",
+      subTitle: 'WIFI Only',
       icon: "printer",
       type: "material-community",
       button: false,
@@ -86,36 +88,40 @@ const SettingScreen = ({ navigation }) => {
       <Icon name={item.icon} type={item.type} />
       <ListItem.Content>
         <ListItem.Title>{item.title}</ListItem.Title>
+        {item.subTitle && <ListItem.Subtitle style={{ color: 'grey' }}>{item.subTitle}</ListItem.Subtitle>}
       </ListItem.Content>
       {!item.button && <ListItem.Chevron />}
     </ListItem>
   );
 
   return (
-    <View style={styles.container}>
-      <Header
-        placement="center"
-        containerStyle={{
-          backgroundColor: "#2E7C31",
-        }}
-        leftComponent={{
-          icon: "menu",
-          color: "#fff",
-          onPress: () => {
-            navigation.toggleDrawer();
-          },
-        }}
-        centerComponent={{
-          text: "Settings",
-          style: { color: "#fff", fontSize: 18, fontWeight: "bold" },
-        }}
-      />
-      <FlatList
-        keyExtractor={keyExtractor}
-        data={list}
-        renderItem={renderItem}
-      />
-    </View>
+    <SafeAreaView style={{ flex: 1 }}>
+      <View style={styles.container}>
+        <Header
+          placement="center"
+          containerStyle={{
+            backgroundColor: "#2E7C31",
+          }}
+          leftComponent={{
+            icon: "menu",
+            color: "#fff",
+            onPress: () => {
+              navigation.toggleDrawer();
+            },
+          }}
+          centerComponent={{
+            text: "Settings",
+            style: { color: "#fff", fontSize: 18, fontWeight: "bold" },
+          }}
+        />
+        <FlatList
+          keyExtractor={keyExtractor}
+          data={list}
+          renderItem={renderItem}
+        />
+      </View>
+    </SafeAreaView>
+
   );
 };
 

@@ -63,7 +63,7 @@ const ReportScreen = ({ navigation }) => {
     );
 
     return (
-        <View style={{ flex: 1 }}>
+        <SafeAreaView style={{ flex: 1 }}>
             <Header
                 placement="center"
                 containerStyle={{
@@ -86,7 +86,7 @@ const ReportScreen = ({ navigation }) => {
                 data={list}
                 renderItem={renderItem}
             />
-        </View>
+        </SafeAreaView>
     )
 }
 

@@ -14,7 +14,7 @@ import { ActivityIndicator } from 'react-native';
 import ReportSummaryTable from '../../components/ReportSummaryTable';
 import { navigate } from '../../navigationRef';
 import { TouchableOpacity } from 'react-native-gesture-handler';
-import { ColumnAliment, COMMANDS, NetPrinter } from 'react-native-thermal-receipt-printer-image-qr';
+import { ColumnAliment, COMMANDS, NetPrinter, PrinterWidth } from 'react-native-thermal-receipt-printer-image-qr';
 import { Toast } from 'native-base';
 
 const DailySaleReportScreen = ({ navigation }) => {
@@ -51,57 +51,111 @@ const DailySaleReportScreen = ({ navigation }) => {
     };
 
     const printReport = async () => {
-        await NetPrinter.init()
-        await NetPrinter.connectPrinter(printer.ipAddress || "", printer.port || 9100)
-        const BOLD_ON = COMMANDS.TEXT_FORMAT.TXT_BOLD_ON;
-        const BOLD_OFF = COMMANDS.TEXT_FORMAT.TXT_BOLD_OFF;
-        // let orderList = [
-        //     ["1. Skirt Palas Labuh Muslimah Fashion", "x2", "500$"],
-        //     ["2. BLOUSE ROPOL VIRAL MUSLIMAH FASHION", "x4222", "500$"],
-        //     ["3. Women Crew Neck Button Down Ruffle Collar Loose Blouse", "x1", "30000000000000$"],
-        //     ["4. Retro Buttons Up Full Sleeve Loose", "x10", "200$"],
-        //     ["5. Retro Buttons Up", "x10", "200$"],
-        // ];
+        try {
+            await NetPrinter.init()
+            await NetPrinter.connectPrinter(printer.ipAddress || "", printer.port || 9100)
+            const BOLD_ON = COMMANDS.TEXT_FORMAT.TXT_BOLD_ON;
+            const BOLD_OFF = COMMANDS.TEXT_FORMAT.TXT_BOLD_OFF;
+            const CENTER = COMMANDS.TEXT_FORMAT.TXT_ALIGN_CT;
+            const OFF_CENTER = COMMANDS.TEXT_FORMAT.TXT_ALIGN_LT;
+            const recalculate = dailysales.map(i => {
+                var actualPayTotal = _.sumBy(i.orderDetails, "totalAmount") +
+                    (i.serviceCharge / 100) *
+                    _.sumBy(i.orderDetails, "totalAmount") +
+                    ((i.cardCharge / 100) *
+                        _.sumBy(i.orderDetails, "totalAmount"))
+                    -
+                    i.promotionAmount
+                    + i.tip + i.diffRoundup
 
-        const recalculate = dailysales.map(i => {
+                return {
+                    actualPay: i.orderType === "partner" ? Number(actualPayTotal - (actualPayTotal * (Number(i.partner.percentage) / 100))) : i.paymentType === "card" ? Number(actualPayTotal - (actualPayTotal * (i.cardCharge / 100))) : actualPayTotal,
+                    paymentType: i.paymentType,
+                    orderType: i.orderType,
+                    partnerName: i.partner ? i.partner.name : ''
+                }
+            })
 
-            var actualPayTotal = _.sumBy(i.orderDetails, "totalAmount") +
-                (i.serviceCharge / 100) *
-                _.sumBy(i.orderDetails, "totalAmount") +
-                ((i.cardCharge / 100) *
-                    _.sumBy(i.orderDetails, "totalAmount"))
-                -
-                i.promotionAmount
-                + i.tip + i.diffRoundup
+            const data = _.map(_.groupBy(recalculate, 'paymentType'),
+                (o, idx) => {
+                    if (idx === "cash" || idx === "card") {
+                        return [
+                            idx ? idx : "N/A",
+                            currency(_.sumBy(o, 'actualPay'), { separator: "," }).format()
+                        ]
+                    }
+                })
 
-            return {
-                actualPay: i.orderType === "partner" ? Number(actualPayTotal - (actualPayTotal * (Number(i.partner.percentage) / 100))) : i.paymentType === "card" ? Number(actualPayTotal - (actualPayTotal * (i.cardCharge / 100))) : actualPayTotal,
-                paymentType: i.paymentType,
-            }
-        })
+            const dineInValue = _.filter(recalculate, { orderType: 'dine-in' })
+            const takeAwayValue = _.filter(recalculate, { orderType: 'take-away' })
+            const deliveryValue = _.filter(recalculate, { orderType: 'delivery' })
 
-        let subTotal = 0
-        const data = _.map(_.groupBy(recalculate, 'paymentType'),
-            (o, idx) => {
-                if (idx === "cash" || idx === "card") {
+            const cashDineInValue = _.filter(dineInValue, { paymentType: 'cash' })
+            const cashTakeAwayValue = _.filter(takeAwayValue, { paymentType: 'cash' })
+            const cashDeliveryValue = _.filter(deliveryValue, { paymentType: 'cash' })
 
-                    // subTotal += _.sumBy(o, 'actualPay')
+            const sumCashDineInValue = _.sumBy(cashDineInValue, 'actualPay')
+            const sumCashTakeAwayValue = _.sumBy(cashTakeAwayValue, 'actualPay')
+            const sumCashDeliveryValue = _.sumBy(cashDeliveryValue, 'actualPay')
 
+            const cardDineInValue = _.filter(dineInValue, { paymentType: 'card' })
+            const cardTakeAwayValue = _.filter(takeAwayValue, { paymentType: 'card' })
+            const cardDeliveryValue = _.filter(deliveryValue, { paymentType: 'card' })
+            const sumCardDineInValue = _.sumBy(cardDineInValue, 'actualPay')
+            const sumCardTakeAwayValue = _.sumBy(cardTakeAwayValue, 'actualPay')
+            const sumCardDeliveryValue = _.sumBy(cardDeliveryValue, 'actualPay')
+
+            const subTotal = sumCashDineInValue +
+                sumCardDineInValue +
+                sumCashTakeAwayValue +
+                sumCardTakeAwayValue +
+                sumCashDeliveryValue +
+                sumCardDeliveryValue
+
+            const partnerValue = _.filter(recalculate, { orderType: 'partner' })
+            const partnerPartnerValue = _.filter(partnerValue, { paymentType: 'partner' })
+            const sumPartnerPartnerValue = _.sumBy(partnerPartnerValue, 'actualPay')
+
+            const dataPartner = _.map(_.groupBy(partnerPartnerValue, 'partnerName'),
+                (o, idx) => {
                     return [
                         idx ? idx : "N/A",
                         currency(_.sumBy(o, 'actualPay'), { separator: "," }).format()
                     ]
-                }
-            })
 
-        let columnAliment = [ColumnAliment.LEFT, ColumnAliment.CENTER];
-        let columnWidth = [15, 15]
-        // await NetPrinter.printText(`${BOLD_ON}${COMMANDS.TEXT_FORMAT.TXT_ALIGN_CT}Summary (${selectDate})\n`);
-        await NetPrinter.printColumnsText(["Name", "Price"], columnWidth, columnAliment, [`${BOLD_ON}`, '', '']);
-        for (let i in data) {
-            await NetPrinter.printColumnsText(data[i], columnWidth, columnAliment, [`${BOLD_OFF}`, '']);
+                })
+
+            let columnWidth = [15, 15]
+            NetPrinter.printText(`${CENTER}${BOLD_ON} Summary (${selectDate}) ${BOLD_OFF}`);
+            NetPrinter.printText(`${CENTER}${COMMANDS.HORIZONTAL_LINE.HR_58MM}${CENTER}`);
+            let columnAliment = [ColumnAliment.LEFT, ColumnAliment.CENTER];
+            for (let i in data) {
+                if (data[i]) {
+                    NetPrinter.printColumnsText(data[i], columnWidth, columnAliment, ['', '']);
+                }
+            }
+            if (sumPartnerPartnerValue) {
+                NetPrinter.printColumnsText(["Online", currency(sumPartnerPartnerValue, { separator: "," }).format()], columnWidth, columnAliment, ['', '']);
+            }
+            NetPrinter.printText(`\n`);
+            if (subTotal) {
+                NetPrinter.printColumnsText(["Sub total", currency(subTotal, { separator: "," }).format()], columnWidth, columnAliment, ['', '']);
+            }
+            if (subTotal) {
+                NetPrinter.printColumnsText(["Grand total", currency(subTotal + sumPartnerPartnerValue, { separator: "," }).format()], columnWidth, columnAliment, ['', '']);
+            }
+
+            NetPrinter.printText(`\n`);
+            for (let p in dataPartner) {
+                if (dataPartner[p]) {
+                    NetPrinter.printColumnsText(dataPartner[p], columnWidth, columnAliment, ['', '']);
+                }
+            }
+
+            NetPrinter.printBill(`\n`, { beep: false });
+        } catch (error) {
+            alert(error.message)
         }
-        await NetPrinter.printBill(`${BOLD_ON}${COMMANDS.TEXT_FORMAT.TXT_ALIGN_CT}Thank you\n`);
     }
 
     const renderChart = () => {
@@ -116,10 +170,11 @@ const DailySaleReportScreen = ({ navigation }) => {
                 -
                 i.promotionAmount
                 + i.tip + i.diffRoundup
-
             return {
                 actualPay: i.orderType === "partner" ? Number(actualPayTotal - (actualPayTotal * (Number(i.partner.percentage) / 100))) : i.paymentType === "card" ? Number(actualPayTotal - (actualPayTotal * (i.cardCharge / 100))) : actualPayTotal,
                 paymentType: i.paymentType,
+                orderType: i.orderType,
+                partnerName: i.partner ? i.partner.name : ''
             }
         })
 
@@ -249,7 +304,7 @@ const DailySaleReportScreen = ({ navigation }) => {
                         marginTop: 5,
                     }}>
                         <TouchableOpacity
-                            onPress={() => {
+                            onPress={async () => {
                                 printReport()
                             }}
                         >
@@ -276,7 +331,7 @@ const DailySaleReportScreen = ({ navigation }) => {
                 </View>
             ) : (
                 <>
-                    <View style={{ flexDirection: 'row' }}>
+                    <View style={{ flexDirection: 'row', flexWrap: 'wrap' }}>
                         {renderChart()}
                         <ReportSummaryTable data={dailysales} />
                     </View>

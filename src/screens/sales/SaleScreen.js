@@ -158,6 +158,7 @@ const SaleScreen = ({ navigation }) => {
           </Text>
           <SelectDropdown
             data={mapCategories(categories)}
+            defaultValueByIndex={0}
             onSelect={async (selectedItem, index) => {
               setCategory({
                 id: selectedItem.id,
