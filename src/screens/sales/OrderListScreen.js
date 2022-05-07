@@ -23,7 +23,6 @@ import {
   FontAwesome,
 } from "@expo/vector-icons";
 import useGetOrderHook from "./../../hooks/sales/useGetOrderHook";
-import { Alert } from "react-native";
 import useOpenOrderHook from "./../../hooks/sales/useOpenOrderHook";
 import Moment from "moment";
 import {
@@ -31,7 +30,7 @@ import {
   SwipeableQuickActionButton,
   SwipeableQuickActions,
 } from "react-native-swipe-list";
-import { BACKEND_URL } from "../../constants";
+import { PARTNER_IMAGE } from "@env"
 
 const OrderListScreen = ({ navigation }) => {
 
@@ -108,7 +107,7 @@ const OrderListScreen = ({ navigation }) => {
                   rounded
                   source={{
                     uri:
-                      `${BACKEND_URL}/api/ver1/image/partners/${item.partner && item.partner.logo}`,
+                      `${PARTNER_IMAGE}${item.partner && item.partner.logo}`,
                   }}
                   size={"medium"}
                 />

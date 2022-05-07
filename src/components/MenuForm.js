@@ -28,7 +28,7 @@ import {
 } from "native-base";
 import * as ImagePicker from 'expo-image-picker';
 import { ActivityIndicator } from 'react-native';
-import { BACKEND_URL, MENU_IMAGE } from '../constants';
+import { BACKEND_URL, MENU_IMAGE } from '@env';
 import Expo, { Constants, Permissions, Camera, MediaLibrary } from 'expo';
 import { Platform } from 'react-native';
 

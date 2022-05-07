@@ -110,7 +110,6 @@ const deletePrinter = (dispatch) => (id) => {
 };
 
 const getBillPrinter = (dispatch) => async () => {
- 
   return await AsyncStorage.getItem('bill_printer');
 }
 

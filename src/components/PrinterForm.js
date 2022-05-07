@@ -52,7 +52,6 @@ export default function PrinterForm({
     useEffect(() => {
         async function getPermissionBluetooth() {
             const { status } = await Permissions.getAsync(Permissions.MOTION);
-            console.log(status);
             if (status !== 'granted') {
                 alert('Hey! You might want to enable bluetooth for my app, they are good.');
             }

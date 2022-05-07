@@ -4,7 +4,7 @@ import { Avatar, Icon, ListItem, Image, Header } from 'react-native-elements'
 import { FlatList } from 'react-native-gesture-handler'
 import { NavigationEvents, withNavigation } from 'react-navigation'
 import { Context as PartnerContext } from './../../context/PartnerContext'
-import { BACKEND_URL } from './../../constants'
+import { PARTNER_IMAGE } from '@env'
 import { navigate } from '../../navigationRef'
 import currency from 'currency.js'
 
@@ -23,7 +23,7 @@ const SelectPartnerScreen = ({ navigation }) => {
             })
         }}>
             <Image
-                source={{ uri: `${BACKEND_URL}/api/ver1/image/partners/${item.logo}` }}
+                source={{ uri: `${PARTNER_IMAGE}${item.logo}` }}
                 style={{ width: 100, height: 100 }}
                 PlaceholderContent={<ActivityIndicator />}
             />

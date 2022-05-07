@@ -7,7 +7,7 @@ import { Divider } from 'react-native-paper'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { Context as SaleContext } from './../../context/SaleContext'
 import { withNavigation } from 'react-navigation'
-import { BACKEND_URL } from '../../constants'
+import { MENU_IMAGE } from '@env'
 import { Toast } from 'native-base'
 import { Alert } from 'react-native'
 import { navigate } from '../../navigationRef'
@@ -56,7 +56,7 @@ const EditItemCartScreen = ({ navigation }) => {
                 <Image
                     style={{ width: 200, height: 200 }}
                     resizeMode="stretch"
-                    source={{ uri: `${BACKEND_URL}/api/ver1/image/menus/${_orderDetail.product.photo}` }}
+                    source={{ uri: `${MENU_IMAGE}${_orderDetail.product.photo}` }}
                     PlaceholderContent={<ActivityIndicator />}
                 />
             </View>

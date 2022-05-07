@@ -28,7 +28,6 @@ import {
 } from "native-base";
 import * as ImagePicker from 'expo-image-picker';
 import { ActivityIndicator } from 'react-native';
-import { BACKEND_URL } from '../constants';
 import { navigate } from '../navigationRef';
 import InputCheckBoxForm from './../components/InputCheckBoxForm'
 

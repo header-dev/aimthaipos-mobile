@@ -26,7 +26,7 @@ import {
 } from "native-base";
 import * as ImagePicker from 'expo-image-picker';
 import { ActivityIndicator } from 'react-native';
-import { BACKEND_URL } from '../constants';
+import { PARTNER_IMAGE } from '@env';
 
 var width = Dimensions.get("window").width;
 
@@ -39,7 +39,7 @@ export default function PartnerForm({
     isLoading
 }) {
     const [image, setImage] = useState({
-        uri: values.logo ? `${BACKEND_URL}/api/ver1/image/partners/${values.logo}` : Image.resolveAssetSource(initailThumb).uri
+        uri: values.logo ? `${PARTNER_IMAGE}${values.logo}` : Image.resolveAssetSource(initailThumb).uri
     })
     useEffect(() => {
     }, []);

@@ -1,9 +1,9 @@
 import axios from 'axios'
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { BACKEND_URL } from './../constants'
+import { BACKEND_URL } from '@env'
 
 const instance = axios.create({
-    baseURL:  `${BACKEND_URL}/api/ver1`
+    baseURL:  `${BACKEND_URL}`
 })
 
 instance.interceptors.request.use(

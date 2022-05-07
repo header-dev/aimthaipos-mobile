@@ -275,8 +275,8 @@ const saleFlow = createStackNavigator(
       screen: () => (
         <ShopProvider>
           <SaleProvider>
-              <TipScreen />
-            </SaleProvider>
+            <TipScreen />
+          </SaleProvider>
         </ShopProvider>
       )
     },
@@ -579,9 +579,11 @@ const reportFlow = createStackNavigator({
   },
   DailySaleReport: {
     screen: () => (
-      <ReportProvider>
-        <DailySaleReportScreen />
-      </ReportProvider>
+      <PrinterProvider>
+        <ReportProvider>
+          <DailySaleReportScreen />
+        </ReportProvider>
+      </PrinterProvider>
     )
   },
   DailySalePartnerScreen: {

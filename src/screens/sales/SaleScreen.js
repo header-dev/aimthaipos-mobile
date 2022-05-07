@@ -7,7 +7,7 @@ import { Context as CategoryContext } from "./../../context/CategoryContext";
 import { Context as SaleContext } from "./../../context/SaleContext";
 import { Context as ProteinContext } from "./../../context/ProteinContext";
 import { NavigationEvents, withNavigation } from "react-navigation";
-import { BACKEND_URL, MENU_IMAGE } from "./../../constants";
+import { BACKEND_URL, MENU_IMAGE } from "@env";
 import _ from "lodash";
 import { AntDesign, MaterialIcons } from "@expo/vector-icons";
 import { navigate } from "../../navigationRef";
@@ -17,7 +17,7 @@ import { ScrollableTab, Tab, Tabs, Toast, Header as NativeHeader } from "native-
 import { FlatGrid } from 'react-native-super-grid';
 import currency from 'currency.js'
 import ItemQuantityModal from "../../components/sales/ItemQuantityModal";
-import { Dropdown } from 'react-native-element-dropdown';
+import SelectDropdown from 'react-native-select-dropdown'
 
 const SaleScreen = ({ navigation }) => {
 
@@ -26,7 +26,6 @@ const SaleScreen = ({ navigation }) => {
     name: "Favorite"
   });
   const [menu, setMenu] = useState("ALL");
-  const [segmentActive, setSegmentActive] = useState(0);
   const [showQuntityModal, setShowQuntityModal] = useState(false)
   const [selectedProduct, setSelectedProduct] = useState(null)
   const [headerTitle, setHeaderTitle] = useState(``)
@@ -76,6 +75,12 @@ const SaleScreen = ({ navigation }) => {
     return () => { };
   }, [currentOrder, order]);
 
+  const mapCategories = (item) => {
+    let cloneItem = item
+    cloneItem = [...cloneItem, { id: 1, name: 'Favorite' }]
+    return _.sortBy(cloneItem, ['id'])
+  }
+
   return (
     <View style={styles.container}>
       <NavigationEvents
@@ -83,7 +88,6 @@ const SaleScreen = ({ navigation }) => {
           fetchCurrentOrder();
           fetchCategory();
           fetchMenuSale(1, "ALL", "Favorite");
-          setSegmentActive(0);
           fetchProtein();
         }}
       />
@@ -152,37 +156,25 @@ const SaleScreen = ({ navigation }) => {
           <Text style={styles.textCap}>
             Categories
           </Text>
-          <Dropdown
-            style={[styles.dropdown, isFocus && { borderColor: 'blue' }]}
-            placeholderStyle={styles.placeholderStyle}
-            selectedTextStyle={styles.selectedTextStyle}
-            inputSearchStyle={styles.inputSearchStyle}
-            iconStyle={styles.iconStyle}
-            data={[...categories, { id: 1, name: 'Favorite' }]}
-            maxHeight={300}
-            labelField="name"
-            valueField="id"
-            placeholder={!isFocus ? 'Select Category' : '...'}
-            searchPlaceholder="Search..."
-            value={category.id}
-            onFocus={() => setIsFocus(true)}
-            onBlur={() => setIsFocus(false)}
-            onChange={async item => {
-              await fetchMenuSale(category.id, menu, category.name !== "Favorite" ? category.id : "Favorite");
+          <SelectDropdown
+            data={mapCategories(categories)}
+            onSelect={async (selectedItem, index) => {
               setCategory({
-                id: item.id,
-                name: item.name
+                id: selectedItem.id,
+                name: selectedItem.name
               })
-              setIsFocus(false);
+              await fetchMenuSale(selectedItem.id, menu, selectedItem.name !== "Favorite" ? selectedItem.id : "Favorite");
             }}
-            renderLeftIcon={() => (
-              <AntDesign
-                style={styles.icon}
-                color={isFocus ? 'blue' : 'black'}
-                name="Safety"
-                size={20}
-              />
-            )}
+            defaultValue={{category}}
+            defaultButtonText={'Select category'}
+            buttonTextAfterSelection={(selectedItem, index) => {
+              return selectedItem.name
+            }}
+            rowTextForSelection={(item, index) => {
+              return item.name
+            }}
+            buttonStyle={styles.dropdown4BtnStyle}
+            buttonTextStyle={styles.dropdown4BtnTxtStyle}
           />
         </View>
         {isLoading && <ActivityIndicator />}
@@ -388,6 +380,15 @@ const styles = StyleSheet.create({
     height: 40,
     fontSize: 16,
   },
+  dropdown4BtnStyle: {
+    width: '25%',
+    height: 50,
+    backgroundColor: '#FFF',
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: 'grey',
+  },
+  dropdown4BtnTxtStyle: {color: '#444', textAlign: 'left'},
 });
 
 export default withNavigation(SaleScreen);

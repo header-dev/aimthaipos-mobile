@@ -9,7 +9,6 @@ import { navigate } from '../../../navigationRef'
 import { Entypo, AntDesign, Foundation } from '@expo/vector-icons';
 import useDeletePromitionHook from './../../../hooks/useDeletePromitionHook'
 import { Alert } from 'react-native'
-import { BACKEND_URL } from './../../../constants'
 
 const PromotionListScreen = ({ navigation }) => {
 

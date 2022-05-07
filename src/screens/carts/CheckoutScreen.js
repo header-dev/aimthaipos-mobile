@@ -64,7 +64,6 @@ const CheckoutScreen = ({ navigation }) => {
           type: 'warning'
         })
       }
-
     })
     return () => { }
   }, [])

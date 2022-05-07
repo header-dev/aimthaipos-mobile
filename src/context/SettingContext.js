@@ -29,7 +29,6 @@ const userReducer = (state, action) => {
 const fetchCard = dispatch => () => {
     dispatch({ type: 'get_card_fetch' })
     backendApi.get('/card').then(response => {
-        console.log(response.data);
         dispatch({ type: 'get_card_success', payload: response.data })
     }).catch(err => dispatch({ type: 'get_card_rejected' }))
 }

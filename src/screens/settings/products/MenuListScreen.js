@@ -16,7 +16,7 @@ import { navigate } from "../../../navigationRef";
 import { MaterialCommunityIcons, Entypo, AntDesign } from "@expo/vector-icons";
 import useDeleteMenuHook from "./../../../hooks/useDeleteMenuHook";
 import { Alert } from "react-native";
-import { BACKEND_URL, MENU_IMAGE } from "./../../../constants";
+import { BACKEND_URL, MENU_IMAGE } from "@env";
 import { priceNumberFormat } from "./../../../utils/NumberUtil";
 import currency from 'currency.js'
 
