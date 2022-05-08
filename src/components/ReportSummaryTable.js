@@ -11,25 +11,25 @@ export default function ReportSummaryTable({
 
     const recalculate = data.map(i => {
 
-        var actualPayTotal = _.sumBy(i.orderDetails, "totalAmount") +
-        (i.serviceCharge / 100) *
-        _.sumBy(i.orderDetails, "totalAmount") +
-        ((i.cardCharge / 100) *
-            _.sumBy(i.orderDetails, "totalAmount"))
-        -
-        i.promotionAmount
-        + i.tip + i.diffRoundup
+        // var actualPayTotal = _.sumBy(i.orderDetails, "totalAmount") +
+        // (i.serviceCharge / 100) *
+        // _.sumBy(i.orderDetails, "totalAmount") +
+        // ((i.cardCharge / 100) *
+        //     _.sumBy(i.orderDetails, "totalAmount"))
+        // -
+        // i.promotionAmount
+        // + i.tip + i.diffRoundup
 
         return {
-            // actualPay: _.sumBy(i.orderDetails, "totalAmount") +
-            //     (i.serviceCharge / 100) *
-            //     _.sumBy(i.orderDetails, "totalAmount") +
-            //     ((i.cardCharge / 100) *
-            //         _.sumBy(i.orderDetails, "totalAmount"))
-            //     -
-            //     i.promotionAmount
-            //     + i.tip + i.diffRoundup,
-            actualPay: i.orderType === "partner" ? Number(actualPayTotal - (actualPayTotal * (Number(i.partner.percentage) / 100))) : i.paymentType === "card" ? Number(actualPayTotal - (actualPayTotal * (i.cardCharge / 100))) : actualPayTotal,
+            actualPay: _.sumBy(i.orderDetails, "totalAmount") +
+                (i.serviceCharge / 100) *
+                _.sumBy(i.orderDetails, "totalAmount") +
+                ((i.cardCharge / 100) *
+                    _.sumBy(i.orderDetails, "totalAmount"))
+                -
+                i.promotionAmount
+                + i.tip + i.diffRoundup,
+            // actualPay: i.orderType === "partner" ? Number(actualPayTotal - (actualPayTotal * (Number(i.partner.percentage) / 100))) : i.paymentType === "card" ? Number(actualPayTotal - (actualPayTotal * (i.cardCharge / 100))) : actualPayTotal,
             paymentType: i.paymentType,
             orderType: i.orderType
         }

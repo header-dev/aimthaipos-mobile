@@ -16,6 +16,7 @@ import { navigate } from '../../navigationRef';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import { ColumnAliment, COMMANDS, NetPrinter, PrinterWidth } from 'react-native-thermal-receipt-printer-image-qr';
 import { Toast } from 'native-base';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 const DailySaleReportScreen = ({ navigation }) => {
 
@@ -69,7 +70,8 @@ const DailySaleReportScreen = ({ navigation }) => {
                     + i.tip + i.diffRoundup
 
                 return {
-                    actualPay: i.orderType === "partner" ? Number(actualPayTotal - (actualPayTotal * (Number(i.partner.percentage) / 100))) : i.paymentType === "card" ? Number(actualPayTotal - (actualPayTotal * (i.cardCharge / 100))) : actualPayTotal,
+                    // actualPay: i.orderType === "partner" ? Number(actualPayTotal - (actualPayTotal * (Number(i.partner.percentage) / 100))) : i.paymentType === "card" ? Number(actualPayTotal - (actualPayTotal * (i.cardCharge / 100))) : actualPayTotal,
+                    actualPay: actualPayTotal,
                     paymentType: i.paymentType,
                     orderType: i.orderType,
                     partnerName: i.partner ? i.partner.name : ''
@@ -80,7 +82,7 @@ const DailySaleReportScreen = ({ navigation }) => {
                 (o, idx) => {
                     if (idx === "cash" || idx === "card") {
                         return [
-                            idx ? idx : "N/A",
+                            `${idx ? idx : "N/A"}`,
                             currency(_.sumBy(o, 'actualPay'), { separator: "," }).format()
                         ]
                     }
@@ -170,8 +172,10 @@ const DailySaleReportScreen = ({ navigation }) => {
                 -
                 i.promotionAmount
                 + i.tip + i.diffRoundup
+
             return {
-                actualPay: i.orderType === "partner" ? Number(actualPayTotal - (actualPayTotal * (Number(i.partner.percentage) / 100))) : i.paymentType === "card" ? Number(actualPayTotal - (actualPayTotal * (i.cardCharge / 100))) : actualPayTotal,
+                // actualPay: i.orderType === "partner" ? Number(actualPayTotal - (actualPayTotal * (Number(i.partner.percentage) / 100))) : i.paymentType === "card" ? Number(actualPayTotal - (actualPayTotal * (i.cardCharge / 100))) : actualPayTotal,
+                actualPay: actualPayTotal,
                 paymentType: i.paymentType,
                 orderType: i.orderType,
                 partnerName: i.partner ? i.partner.name : ''
@@ -275,7 +279,7 @@ const DailySaleReportScreen = ({ navigation }) => {
     )
 
     return (
-        <View style={{ flex: 1 }}>
+        <SafeAreaView style={{ flex: 1 }}>
             <NavigationEvents
                 onWillFocus={() => {
                     fetchDailySaleReport(selectDate || "")
@@ -351,7 +355,7 @@ const DailySaleReportScreen = ({ navigation }) => {
                     />
                 </>
             )}
-        </View>
+        </SafeAreaView>
     )
 }
 
