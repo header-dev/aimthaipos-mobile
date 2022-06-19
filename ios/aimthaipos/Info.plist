@@ -46,6 +46,9 @@
 			</dict>
 		</dict>
 	</dict>
+	<key>NSBluetoothAlwaysUsageDescription</key>
+	<string>Give $(PRODUCT_NAME) permission to printer network or bluetooth to find, connect and transfer data between different devices
+    </string>
 	<key>NSCameraUsageDescription</key>
 	<string>Allow $(PRODUCT_NAME) to access your camera</string>
 	<key>NSMicrophoneUsageDescription</key>
@@ -73,8 +76,5 @@
 	<string>Light</string>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<false/>
-	<key>NSBluetoothAlwaysUsageDescription</key>
-	<string>Give $(PRODUCT_NAME) permission to printer network or bluetooth to find, connect and transfer data between different devices
-    </string>
 </dict>
 </plist>

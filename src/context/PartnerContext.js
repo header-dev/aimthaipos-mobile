@@ -3,7 +3,7 @@ import backendApi from '../api/backend'
 import { navigate } from './../navigationRef'
 import { Toast } from 'native-base'
 import { Platform } from 'react-native'
-
+import { BACKEND_URL } from '@env'
 const initialState = {
     users: { data: [], isLoading: false, isRejected: false },
 }
@@ -68,23 +68,58 @@ const createFormData = (photo, body) => {
 
 const createPartner = dispatch => async (image, value) => {
 
+    // try {
+    //     dispatch({ type: "save_partner_loading" })
+
+    // await backendApi.post('/partner/save', createFormData(image, {
+    //     id: value.id,
+    //     name: value.name,
+    //     chargePrice: value.chargePrice,
+    //     percentage: value.percentage
+    // }), {
+    //     headers: new Headers({
+    //         'Content-Type': 'application/x-www-form-urlencoded', //Specifying the Content-Type
+    //     })
+    // })
+
+    //     dispatch({ type: "save_partner_success" })
+    // } catch (error) {
+    //     dispatch({ type: "save_partner_rejected" })
+    // }
+
     try {
         dispatch({ type: "save_partner_loading" })
 
-        await backendApi.post('/partner/save', createFormData(image, {
-            id: value.id,
-            name: value.name,
-            chargePrice: value.chargePrice,
-            percentage: value.percentage
-        }), {
-            headers: new Headers({
-                'Content-Type': 'application/x-www-form-urlencoded', //Specifying the Content-Type
-            })
-        })
+        const data = new FormData();
+        data.append("fileData", {
+            uri: Platform.OS === "android" ? image.uri : image.uri.replace("file://", ""),
+            name: "photo.jpg",
+            type: image.type,
+        });
+        
+        Object.keys(value).forEach((key) => {
+            data.append(key, value[key]);
+        });
+        const token = await AsyncStorage.getItem('token')
+        const setting = {
+            method: "POST",
+            headers: {
+                "Content-Type": "multipart/form-data;",
+                "Authorization": `Bearer ${token}`
+            },
+            body: data,
+        };
 
+        await fetch(BACKEND_URL + '/partner/save', setting);
         dispatch({ type: "save_partner_success" })
+        navigate('MenuList')
     } catch (error) {
         dispatch({ type: "save_partner_rejected" })
+        Toast.show({
+            text: error.message,
+            buttonText: "Okay",
+            type: "warning",
+        });
     }
 }
 
@@ -100,7 +135,7 @@ const deletePartner = dispatch => (id) => {
                 })
             }
 
-        }).catch(err => {})
+        }).catch(err => { })
 }
 
 export const { Provider, Context } = createDataContext(

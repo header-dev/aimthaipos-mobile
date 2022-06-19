@@ -6,10 +6,8 @@ import { navigate } from '../navigationRef';
 export default () => {
     const { createMenu } = useContext(MenuContext);
 
-    const saveMenu = (image,value) => {
-        createMenu(image,value).then(() => {
-            navigate('MenuList')
-        })
+    const saveMenu = (image, value) => {
+        createMenu(image, value)
     }
 
     return [saveMenu]

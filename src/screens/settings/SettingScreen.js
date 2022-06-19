@@ -1,84 +1,83 @@
-import React from "react";
-import { FlatList, View, Text, StyleSheet } from "react-native";
-import { Header, Icon, ListItem } from "react-native-elements";
-import { SafeAreaView } from "react-native-safe-area-context";
+import React from 'react';
+import { FlatList, View, Text, StyleSheet } from 'react-native';
+import { Header, Icon, ListItem } from 'react-native-elements';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 const SettingScreen = ({ navigation }) => {
-
   const list = [
     {
-      title: "User Management",
-      icon: "user-cog",
-      type: "font-awesome-5",
+      title: 'User Management',
+      icon: 'user-cog',
+      type: 'font-awesome-5',
       button: false,
       action: () => {
-        navigation.navigate("UserList");
+        navigation.navigate('UserList');
       },
     },
     {
-      title: "Shop Info Management",
-      icon: "info-circle",
-      type: "font-awesome-5",
+      title: 'Store Info Management',
+      icon: 'info-circle',
+      type: 'font-awesome-5',
       button: false,
       action: () => {
-        navigation.navigate("ShopList");
+        navigation.navigate('ShopList');
       },
     },
     {
-      title: "Production Management",
-      icon: "restaurant-menu",
-      type: "material-icon",
+      title: 'Menu Management',
+      icon: 'restaurant-menu',
+      type: 'material-icon',
       button: false,
       action: () => {
-        navigation.navigate("ProductionMain");
+        navigation.navigate('ProductionMain');
       },
     },
     {
-      title: "Promotion Management",
-      icon: "burst-sale",
-      type: "foundation",
+      title: 'Promotion Management',
+      icon: 'burst-sale',
+      type: 'foundation',
       button: false,
       action: () => {
-        navigation.navigate("PromotionList");
+        navigation.navigate('PromotionList');
       },
     },
     {
-      title: "Partner Management",
-      icon: "supple",
-      type: "font-awesome-5",
+      title: 'Partner Management',
+      icon: 'supple',
+      type: 'font-awesome-5',
       button: false,
       action: () => {
-        navigation.navigate("PartnerList");
+        navigation.navigate('PartnerList');
       },
     },
     {
-      title: "Table Management",
-      icon: "table-chair",
-      type: "material-community",
+      title: 'Table Management',
+      icon: 'table-chair',
+      type: 'material-community',
       button: false,
       action: () => {
-        navigation.navigate("TableList");
+        navigation.navigate('TableList');
       },
     },
     {
-      title: "Services Fee Management",
-      icon: "credit-card",
-      type: "font-awensome5",
+      title: 'Services Fee Management',
+      icon: 'credit-card',
+      type: 'font-awensome5',
       button: false,
       action: () => {
-        navigation.navigate("CardServiceFeeScreen");
+        navigation.navigate('CardServiceFeeScreen');
       },
     },
     {
-      title: "Printer Preferences",
+      title: 'Printer Preferences',
       subTitle: 'WIFI Only',
-      icon: "printer",
-      type: "material-community",
+      icon: 'printer',
+      type: 'material-community',
       button: false,
       action: () => {
-        navigation.navigate("PrinterSettings");
+        navigation.navigate('PrinterSettings');
       },
-    }
+    },
   ];
 
   const keyExtractor = (item, index) => index.toString();
@@ -88,7 +87,11 @@ const SettingScreen = ({ navigation }) => {
       <Icon name={item.icon} type={item.type} />
       <ListItem.Content>
         <ListItem.Title>{item.title}</ListItem.Title>
-        {item.subTitle && <ListItem.Subtitle style={{ color: 'grey' }}>{item.subTitle}</ListItem.Subtitle>}
+        {item.subTitle && (
+          <ListItem.Subtitle style={{ color: 'grey' }}>
+            {item.subTitle}
+          </ListItem.Subtitle>
+        )}
       </ListItem.Content>
       {!item.button && <ListItem.Chevron />}
     </ListItem>
@@ -100,18 +103,18 @@ const SettingScreen = ({ navigation }) => {
         <Header
           placement="center"
           containerStyle={{
-            backgroundColor: "#2E7C31",
+            backgroundColor: '#2E7C31',
           }}
           leftComponent={{
-            icon: "menu",
-            color: "#fff",
+            icon: 'menu',
+            color: '#fff',
             onPress: () => {
               navigation.toggleDrawer();
             },
           }}
           centerComponent={{
-            text: "Settings",
-            style: { color: "#fff", fontSize: 18, fontWeight: "bold" },
+            text: 'Settings',
+            style: { color: '#fff', fontSize: 18, fontWeight: 'bold' },
           }}
         />
         <FlatList
@@ -121,7 +124,6 @@ const SettingScreen = ({ navigation }) => {
         />
       </View>
     </SafeAreaView>
-
   );
 };
 
