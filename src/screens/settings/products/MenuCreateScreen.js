@@ -71,14 +71,15 @@ const MenuCreateScreen = ({ navigation }) => {
             cost: '',
             price: '',
             photo: '',
-            printerId: '',
+            printerId: null,
             subSetMenu: false,
           }}
           categories={categories}
           printers={printers}
           validateSchema={MenuFormSchema}
-          onSubmit={(image, value) => {
-            saveMenu(image, value);
+          onSubmit={(image, value, imageChanged) => {
+            value.id = 0;
+            saveMenu(image, imageChanged, value);
           }}
           isLoading={isLoading}
         />

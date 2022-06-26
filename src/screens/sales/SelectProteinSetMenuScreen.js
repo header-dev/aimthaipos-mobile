@@ -1,6 +1,6 @@
 import React, { useContext } from 'react';
 import { FlatList } from 'react-native';
-import { View } from 'react-native';
+
 import { Header, ListItem, Text } from 'react-native-elements';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { NavigationEvents, withNavigation } from 'react-navigation';
@@ -8,22 +8,24 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 import { Context as ProteinContext } from './../../context/ProteinContext';
 import { Context as SaleContext } from './../../context/SaleContext';
+
 import { ActivityIndicator } from 'react-native';
 import currencyJs from 'currency.js';
 import { Alert } from 'react-native';
 import { navigate } from '../../navigationRef';
 
-const SelectProteinScreen = ({ navigation }) => {
-  const menu = navigation.getParam('menu');
-  const _orderId = navigation.getParam('_orderId');
-  const _makeTakeAway = navigation.getParam('_makeTakeAway');
-  const _partnerPrice = navigation.getParam('_partnerPrice');
-  const _quantity = navigation.getParam('_quantity');
+const SelectProteinSetMenuScreen = ({ navigation }) => {
+  const main_menu_id = navigation.getParam('main_menu_id');
+  const productId = navigation.getParam('item');
+  const selectItem = navigation.getParam('selectItem');
+  const allSubMenu = navigation.getParam('allSubMenu');
 
   const {
     state: { proteins, isLoading, isRejected },
     fetchProtein,
   } = useContext(ProteinContext);
+
+  const { addSetMenu, removeSetMenu } = useContext(SaleContext);
 
   const keyExtractor = (item, index) => index.toString();
 
@@ -31,33 +33,8 @@ const SelectProteinScreen = ({ navigation }) => {
     <ListItem
       bottomDivider
       onPress={() => {
-        Alert.alert(
-          'Confirmation',
-          'Are you sure you want to select this protein ?',
-          [
-            {
-              text: 'Cancel',
-              onPress: () => {},
-              style: 'cancel',
-            },
-            {
-              text: 'OK',
-              onPress: () => {
-                const { id, addition_price } = item;
-                navigate('SaleRequest', {
-                  _menu: menu,
-                  _proteinId: id,
-                  _addition_price: addition_price,
-                  _orderId: _orderId,
-                  _makeTakeAway: _makeTakeAway,
-                  _partnerPrice: _partnerPrice,
-                  _quantity: _quantity,
-                });
-              },
-            },
-          ],
-          { cancelable: false }
-        );
+        navigation.state.params.onGoBack(item, selectItem, allSubMenu);
+        navigation.goBack();
       }}
     >
       <MaterialCommunityIcons name="food-steak" size={50} color="#517fa4" />
@@ -118,4 +95,4 @@ const SelectProteinScreen = ({ navigation }) => {
   );
 };
 
-export default withNavigation(SelectProteinScreen);
+export default withNavigation(SelectProteinSetMenuScreen);

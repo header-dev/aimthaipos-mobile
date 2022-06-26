@@ -88,6 +88,8 @@ import CardServiceFeeScreen from './src/screens/settings/card-services-fee/CardS
 import ReductionReportScreen from './src/screens/reports/ReductionReportScreen';
 import TipScreen from './src/screens/carts/TipScreen';
 import SubSetMenuScreen from './src/screens/sales/SubSetMenuScreen';
+import SelectProteinSetMenuScreen from './src/screens/sales/SelectProteinSetMenuScreen';
+import SaleRequestSetMenuScreen from './src/screens/sales/SaleRequestSetMenuScreen';
 
 LogBox.ignoreAllLogs();
 
@@ -196,9 +198,11 @@ const saleFlow = createStackNavigator(
       screen: () => (
         <CategoryProvider>
           <ProteinProvider>
-            <SaleProvider>
-              <SaleScreen />
-            </SaleProvider>
+            <MenuProvider>
+              <SaleProvider>
+                <SaleScreen />
+              </SaleProvider>
+            </MenuProvider>
           </ProteinProvider>
         </CategoryProvider>
       ),
@@ -207,24 +211,47 @@ const saleFlow = createStackNavigator(
       screen: () => (
         <CategoryProvider>
           <ProteinProvider>
-            <SaleProvider>
-              <SubSetMenuScreen />
-            </SaleProvider>
+            <MenuProvider>
+              <SaleProvider>
+                <SubSetMenuScreen />
+              </SaleProvider>
+            </MenuProvider>
           </ProteinProvider>
         </CategoryProvider>
       ),
-      navigationOptions: ({ navigation }) => ({
-        headerTitle: 'Select Sub Set Menu',
-        headerStyle: {
-          backgroundColor: 'green',
-        },
-        headerTintColor: 'white',
-      }),
+    },
+    SelectProteinSetMenu: {
+      screen: () => (
+        <ProteinProvider>
+          <SaleProvider>
+            <SelectProteinSetMenuScreen />
+          </SaleProvider>
+        </ProteinProvider>
+      ),
+    },
+    SelectProtein: {
+      screen: () => (
+        <ProteinProvider>
+          <SaleProvider>
+            <SelectProteinScreen />
+          </SaleProvider>
+        </ProteinProvider>
+      ),
     },
     SaleRequest: {
       screen: () => (
         <SaleProvider>
           <SaleRequestScreen />
+        </SaleProvider>
+      ),
+      navigationOptions: ({ navigation }) => ({
+        headerTitle: 'SALE (REQUEST / REMARK)',
+      }),
+    },
+    SaleRequestSetMenu: {
+      screen: () => (
+        <SaleProvider>
+          <SaleRequestSetMenuScreen />
         </SaleProvider>
       ),
       navigationOptions: ({ navigation }) => ({
@@ -310,7 +337,7 @@ const saleFlow = createStackNavigator(
     },
   },
   {
-    // headerMode: 'none',
+    headerMode: 'none',
   }
 );
 

@@ -50,6 +50,7 @@ export default function MenuForm({
   onSubmit,
   isLoading,
 }) {
+  const [imageChanged, setImageChanged] = useState(false);
   const [image, setImage] = useState({
     uri: values.photo
       ? `${MENU_IMAGE}${values.photo}`
@@ -66,6 +67,7 @@ export default function MenuForm({
     });
 
     if (!result.cancelled) {
+      setImageChanged(true);
       setImage({
         uri: result.uri,
       });
@@ -78,7 +80,7 @@ export default function MenuForm({
         return false;
         break;
       case 'protein':
-        return true;
+        return false;
         break;
       case 'set':
         return true;
@@ -110,7 +112,7 @@ export default function MenuForm({
           initialValues={values}
           enableReinitialize
           onSubmit={(values) => {
-            onSubmit(image, values);
+            onSubmit(image, values, imageChanged);
           }}
           validationSchema={validateSchema}
         >

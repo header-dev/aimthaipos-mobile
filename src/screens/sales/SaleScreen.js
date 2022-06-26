@@ -14,6 +14,7 @@ import SegmentedControl from '@react-native-segmented-control/segmented-control'
 import { Context as CategoryContext } from './../../context/CategoryContext';
 import { Context as SaleContext } from './../../context/SaleContext';
 import { Context as ProteinContext } from './../../context/ProteinContext';
+import { Context as MenuContext } from './../../context/MenuContext';
 import { NavigationEvents, withNavigation } from 'react-navigation';
 import { BACKEND_URL, MENU_IMAGE } from '@env';
 import _ from 'lodash';
@@ -64,6 +65,12 @@ const SaleScreen = ({ navigation }) => {
   } = useContext(SaleContext);
 
   const {
+    state: { submenus },
+    fetchSubSetMenu,
+    addProteinToItem,
+  } = useContext(MenuContext);
+
+  const {
     state: { proteins },
     fetchProtein,
   } = useContext(ProteinContext);
@@ -98,6 +105,7 @@ const SaleScreen = ({ navigation }) => {
           fetchCurrentOrder();
           fetchCategory();
           fetchMenuSale(1, 'ALL', 'Favorite');
+          fetchSubSetMenu('');
           fetchProtein();
         }}
       />
@@ -262,7 +270,7 @@ const SaleScreen = ({ navigation }) => {
         onSubmit={({ quantity }) => {
           setShowQuntityModal(false);
 
-          const { id, name, price, specialPrice, type, category } =
+          const { id, name, price, specialPrice, type, category, photo } =
             selectedProduct;
 
           let makeToTakeAway = false;
@@ -270,7 +278,6 @@ const SaleScreen = ({ navigation }) => {
           if (currentOrder.orderType === 'take-away') {
             makeToTakeAway = true;
           }
-
           let partnerPrice = 0;
           if (currentOrder.orderType === 'partner') {
             partnerPrice = currentOrder.partner.chargePrice;
@@ -290,12 +297,15 @@ const SaleScreen = ({ navigation }) => {
             });
           } else if (type === 'set') {
             navigate('SubSetMenu', {
+              currentOrder,
               menu: {
                 productId: id,
                 price:
                   currentOrder.orderType === 'partner' ? specialPrice : price,
                 name: name,
+                photo: photo,
               },
+              submenus,
               _orderId: currentOrder.id,
               _makeTakeAway: makeToTakeAway,
               _partnerPrice: partnerPrice,

@@ -14,6 +14,7 @@ import {
   Image,
   Header,
   SearchBar,
+  CheckBox,
 } from 'react-native-elements';
 import { FlatList } from 'react-native-gesture-handler';
 import { NavigationEvents, withNavigation } from 'react-navigation';
@@ -26,7 +27,7 @@ import { Alert } from 'react-native';
 import { BACKEND_URL, MENU_IMAGE } from '@env';
 import { priceNumberFormat } from './../../../utils/NumberUtil';
 import currency from 'currency.js';
-
+const initailThumb = require('./../../../../assets/thumbnail-empty.png');
 const MenuListScreen = ({ navigation }) => {
   const [isSwiping, setIsSwiping] = useState(false);
 
@@ -93,7 +94,11 @@ const MenuListScreen = ({ navigation }) => {
     >
       <ListItem bottomDivider>
         <Image
-          source={{ uri: `${MENU_IMAGE}${item.photo}` }}
+          source={{
+            uri: item.photo
+              ? `${MENU_IMAGE}${item.photo}`
+              : Image.resolveAssetSource(initailThumb).uri,
+          }}
           style={{ width: 100, height: 100 }}
           PlaceholderContent={<ActivityIndicator />}
         />
@@ -117,6 +122,15 @@ const MenuListScreen = ({ navigation }) => {
         <ListItem.Content>
           <ListItem.Title>Type:</ListItem.Title>
           <ListItem.Subtitle>{item.type}</ListItem.Subtitle>
+        </ListItem.Content>
+        <ListItem.Content>
+          <ListItem.Subtitle>
+            <CheckBox
+              checked={item.subSetMenu}
+              title="Sub Set Menu"
+              size={35}
+            />
+          </ListItem.Subtitle>
         </ListItem.Content>
       </ListItem>
     </Swipeable>

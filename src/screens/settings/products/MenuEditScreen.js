@@ -1,5 +1,11 @@
-import React, { useContext } from 'react';
-import { StyleSheet } from 'react-native';
+import React, { useContext, useState } from 'react';
+import {
+  ActivityIndicator,
+  Image,
+  StyleSheet,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import { Container, Body } from 'native-base';
 import useSaveMenuHook from '../../../hooks/useSaveMenuHook';
 import MenuForm from '../../../components/MenuForm';
@@ -9,6 +15,10 @@ import { Context as PrinterContext } from './../../../context/PrinterContext';
 import * as Yup from 'yup';
 import { NavigationEvents, withNavigation } from 'react-navigation';
 import { Header } from 'react-native-elements';
+import { Image as ImageElement } from 'react-native-elements';
+import { BACKEND_URL, MENU_IMAGE } from '@env';
+import { useEffect } from 'react';
+import * as ImagePicker from 'expo-image-picker';
 
 const MenuFormSchema = Yup.object().shape({
   name: Yup.string().required('Please enter a name.'),
@@ -24,6 +34,9 @@ const PartnerEditScreen = ({ navigation }) => {
   } = useContext(MenuContext);
 
   const _menu = navigation.getParam('_menu');
+
+  const [image, setImage] = useState();
+
   const {
     state: { categories },
     fetchCategory,
@@ -55,6 +68,27 @@ const PartnerEditScreen = ({ navigation }) => {
           style: { color: '#fff', fontSize: 18, fontWeight: 'bold' },
         }}
       />
+      {/* <View
+        style={{
+          alignItems: 'center',
+          margin: 10,
+        }}
+      >
+        <TouchableOpacity activeOpacity={0.7} onPress={pickImage}>
+          <ImageElement
+            style={{
+              width: 200,
+              height: 200,
+            }}
+            source={{
+              uri: image
+                ? image.uri
+                : Image.resolveAssetSource(initailThumb).uri,
+            }}
+            PlaceholderContent={<ActivityIndicator />}
+          />
+        </TouchableOpacity>
+      </View> */}
       <MenuForm
         values={{
           name: _menu.name,
@@ -68,9 +102,9 @@ const PartnerEditScreen = ({ navigation }) => {
           subSetMenu: _menu.subSetMenu,
         }}
         validateSchema={MenuFormSchema}
-        onSubmit={(photo, value) => {
+        onSubmit={(image, value, imageChanged) => {
           value.id = _menu.id;
-          saveMenu(photo, value);
+          saveMenu(image, imageChanged, value);
         }}
         categories={categories}
         isLoading={isLoading}
