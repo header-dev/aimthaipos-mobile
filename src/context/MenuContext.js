@@ -84,10 +84,12 @@ const userReducer = (state, action) => {
 
 const fetchMenu =
   (dispatch) =>
-  (query = '') => {
+  (query = '', type = '', category = '', subsetmenu = '') => {
     dispatch({ type: 'get_menu_fetch' });
     backendApi
-      .get(`/menu?q=${query}`)
+      .get(
+        `/menu?q=${query}&type=${type}&category=${category}&subsetmenu=${subsetmenu}`
+      )
       .then((response) => {
         dispatch({ type: 'get_menu_success', payload: response.data });
       })

@@ -15,6 +15,7 @@ import {
   Header,
   SearchBar,
   CheckBox,
+  Button,
 } from 'react-native-elements';
 import { FlatList } from 'react-native-gesture-handler';
 import { NavigationEvents, withNavigation } from 'react-navigation';
@@ -27,6 +28,7 @@ import { Alert } from 'react-native';
 import { BACKEND_URL, MENU_IMAGE } from '@env';
 import { priceNumberFormat } from './../../../utils/NumberUtil';
 import currency from 'currency.js';
+import { primaryColor } from '../../../constants';
 const initailThumb = require('./../../../../assets/thumbnail-empty.png');
 const MenuListScreen = ({ navigation }) => {
   const [isSwiping, setIsSwiping] = useState(false);
@@ -34,6 +36,12 @@ const MenuListScreen = ({ navigation }) => {
   const [searchValue, setSearchValue] = useState('');
 
   const [currentlyOpenSwipeable, setCurrentlyOpenSwipeable] = useState(null);
+
+  useEffect(() => {
+    fetchMenu(searchValue);
+
+    return () => {};
+  }, []);
 
   const {
     state: { menus, isLoading, isRejected },
@@ -126,6 +134,12 @@ const MenuListScreen = ({ navigation }) => {
         <ListItem.Content>
           <ListItem.Subtitle>
             <CheckBox
+              containerStyle={{
+                backgroundColor: 'white',
+                borderWidth: 0,
+                justifyContent: 'center',
+              }}
+              disabled
               checked={item.subSetMenu}
               title="Sub Set Menu"
               size={35}
@@ -137,11 +151,7 @@ const MenuListScreen = ({ navigation }) => {
   );
   return (
     <View style={styles.container}>
-      <NavigationEvents
-        onWillFocus={() => {
-          fetchMenu(searchValue);
-        }}
-      />
+      <NavigationEvents onWillFocus={() => {}} />
       <NavigationEvents
         onWillFocus={
           currentlyOpenSwipeable && currentlyOpenSwipeable.recenter()
@@ -150,7 +160,7 @@ const MenuListScreen = ({ navigation }) => {
       <Header
         placement="center"
         containerStyle={{
-          backgroundColor: '#2E7C31',
+          backgroundColor: primaryColor,
         }}
         leftComponent={{
           icon: 'arrow-back',
@@ -171,16 +181,42 @@ const MenuListScreen = ({ navigation }) => {
           },
         }}
       />
-      <SearchBar
-        placeholder="Find Name..."
-        lightTheme
-        round
-        onChangeText={(search) => {
-          fetchMenu(search);
-          setSearchValue(search);
-        }}
-        value={searchValue}
-      />
+      <View style={styles.panelSearch}>
+        <View
+          style={{
+            flexGrow: 1,
+          }}
+        >
+          <SearchBar
+            placeholder="Find Name..."
+            lightTheme
+            round
+            onChangeText={(search) => {
+              fetchMenu(search, '', '', '');
+              setSearchValue(search);
+            }}
+            value={searchValue}
+          />
+        </View>
+        <View style={{ width: 65 }}>
+          <Button
+            buttonStyle={styles.filterButton}
+            icon={<Icon name="filter" type="font-awesome" color={'white'} />}
+            onPress={() => {
+              navigate('MenuSearch', {
+                onFilter: (values) => {
+                  fetchMenu(
+                    values?.name,
+                    values?.type,
+                    values?.categoryId,
+                    values?.subsetmenu
+                  );
+                },
+              });
+            }}
+          />
+        </View>
+      </View>
       {isLoading && <ActivityIndicator animating style={{ marginTop: 10 }} />}
       <FlatList
         keyExtractor={keyExtractor}
@@ -196,6 +232,14 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     backgroundColor: 'white',
+  },
+  filterButton: {
+    backgroundColor: 'grey',
+    flexGrow: 1,
+    height: 65,
+  },
+  panelSearch: {
+    flexDirection: 'row',
   },
   imageThumbnail: {
     justifyContent: 'center',

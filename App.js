@@ -90,6 +90,7 @@ import TipScreen from './src/screens/carts/TipScreen';
 import SubSetMenuScreen from './src/screens/sales/SubSetMenuScreen';
 import SelectProteinSetMenuScreen from './src/screens/sales/SelectProteinSetMenuScreen';
 import SaleRequestSetMenuScreen from './src/screens/sales/SaleRequestSetMenuScreen';
+import SearchMenuScreen from './src/screens/settings/products/SearchMenuScreen';
 
 LogBox.ignoreAllLogs();
 
@@ -522,6 +523,15 @@ const settingFlow = createStackNavigator(
               <MenuEditScreen />
             </CategoryProvider>
           </PrinterProvider>
+        </MenuProvider>
+      ),
+    },
+    MenuSearch: {
+      screen: () => (
+        <MenuProvider>
+          <CategoryProvider>
+            <SearchMenuScreen />
+          </CategoryProvider>
         </MenuProvider>
       ),
     },
