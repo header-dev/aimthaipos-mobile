@@ -13,6 +13,9 @@ export const TXT_ALIGN_LT_OFF = '\x1b\x61\x00';
 export const BOLD_ON = '\x1b\x45\x01';
 export const BOLD_OFF = '\x1b\x45\x00';
 
+export const dividerLine58mm = '------------------------------';
+export const dividerLine80mm = '----------------------------------------------';
+
 export const TXT_CUSTOM_SIZE = (width, height) => {
   // other sizes
   var widthDec = (width - 1) * 16;

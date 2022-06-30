@@ -9,7 +9,11 @@ import { ActivityIndicator } from 'react-native';
 import { priceNumberFormat } from '../../utils/NumberUtil';
 import _ from 'lodash';
 import currency from 'currency.js';
-import { NetPrinter } from 'react-native-thermal-receipt-printer-image-qr';
+import {
+  ColumnAliment,
+  COMMANDS,
+  NetPrinter,
+} from 'react-native-thermal-receipt-printer-image-qr';
 import moment from 'moment';
 import { Context as AuthContext } from './../../context/AuthContext';
 import { Context as PrinterContext } from './../../context/PrinterContext';
@@ -27,6 +31,8 @@ import {
   TXT_ALIGN_LT_OFF,
   TXT_ALIGN_RT,
   TXT_ALIGN_RT_OFF,
+  dividerLine58mm,
+  dividerLine80mm,
 } from '../../constants';
 import { ScrollView } from 'react-native';
 
@@ -208,6 +214,241 @@ const CartScreen = ({ navigation }) => {
     item + protein.padStart(25 - item.length, '.');
 
   const printOrder = () => {
+    const orderDetail = order.orderDetails;
+    debugger;
+    if (orderDetail.length > 0) {
+      Alert.alert('Confirm', 'Are you sure you want to order ?', [
+        {
+          text: 'Cancel',
+          onPress: () => {},
+          style: 'cancel',
+        },
+        {
+          text: 'OK',
+          onPress: async () => {
+            try {
+              const BOLD_ON = COMMANDS.TEXT_FORMAT.TXT_BOLD_ON;
+              const BOLD_OFF = COMMANDS.TEXT_FORMAT.TXT_BOLD_OFF;
+
+              await NetPrinter.connectPrinter(
+                printer.ipAddress || '',
+                printer.port || 9100
+              );
+              const jobDate = moment().format('DD/MM/YYYY HH:mm:ss');
+              const orderPrint = _.orderBy(
+                orderDetail,
+                (item) => item.product.category.dataLevel,
+                ['asc']
+              );
+
+              NetPrinter.printColumnsText(
+                ['JOB LIST'],
+                [printer.size],
+                [ColumnAliment.CENTER],
+                [`${COMMANDS.TEXT_FORMAT.TXT_2HEIGHT}${BOLD_ON}`]
+              );
+              NetPrinter.printText(
+                printer.size === '30' ? dividerLine58mm : dividerLine80mm
+              );
+
+              NetPrinter.printColumnsText(
+                [jobDate],
+                [printer.size],
+                [ColumnAliment.CENTER],
+                [`${COMMANDS.TEXT_FORMAT.TXT_2HEIGHT}${BOLD_ON}`]
+              );
+
+              let contentType = ``;
+              if (order.orderType === 'take-away') {
+                contentType = `Take Away`;
+              } else if (order.orderType === 'partner') {
+                contentType = `Partner : ${order.partner.name}`;
+              } else if (order.orderType === 'delivery') {
+                contentType = `Delivery`;
+              } else {
+                contentType = `${_tableNo}`;
+              }
+
+              const subHeader = [currentOrder?.orderNo, contentType];
+              NetPrinter.printColumnsText(
+                subHeader,
+                [10, Number(printer.size) / 2],
+                [ColumnAliment.LEFT, ColumnAliment.LEFT],
+                [
+                  `${COMMANDS.TEXT_FORMAT.TXT_2HEIGHT}${BOLD_ON}`,
+                  `${COMMANDS.TEXT_FORMAT.TXT_2HEIGHT}${BOLD_ON}`,
+                ]
+              );
+
+              NetPrinter.printText(
+                `${COMMANDS.TEXT_FORMAT.TXT_2HEIGHT}${BOLD_ON}${
+                  user && user?.username
+                }${BOLD_OFF}`
+              );
+
+              NetPrinter.printText(
+                printer.size === '30' ? dividerLine58mm : dividerLine80mm
+              );
+
+              _.orderBy(orderPrint, 'category.dataLevel').map((i) => {
+                let wordTakeAway = ``;
+                if (
+                  i.makeTakeAway ||
+                  order.orderType === 'take-away' ||
+                  order.orderType === 'partner'
+                ) {
+                  wordTakeAway = '(TA)';
+                }
+
+                let columnSize = [];
+
+                if (printer.size === '30') {
+                  columnSize = [5, 15, 10];
+                } else if (printer.size === '46') {
+                  columnSize = [6, 20, 20];
+                }
+
+                NetPrinter.printColumnsText(
+                  [
+                    `${i.quantity} - ${wordTakeAway}`,
+                    i.product.name,
+                    i.protein ? i.protein.name : '',
+                  ],
+                  columnSize,
+                  [ColumnAliment.LEFT, ColumnAliment.LEFT, ColumnAliment.RIGHT],
+                  [`${BOLD_ON}`, ``, ``]
+                );
+
+                if (i.setmenus.length > 0) {
+                  NetPrinter.printColumnsText(
+                    ['Set Menu'],
+                    [printer.size],
+                    [ColumnAliment.LEFT],
+                    [`${BOLD_ON}`]
+                  );
+                  i.setmenus.map((sm) => {
+                    NetPrinter.printColumnsText(
+                      [
+                        `- ${sm.product?.name}`,
+                        sm.protein ? sm.protein?.name : '',
+                      ],
+                      [15, 15],
+                      [ColumnAliment.LEFT, ColumnAliment.RIGHT],
+                      [`${BOLD_ON}`, ``]
+                    );
+                  });
+                }
+              });
+
+              NetPrinter.printText(
+                printer.size === '30' ? dividerLine58mm : dividerLine80mm
+              );
+
+              NetPrinter.printColumnsText(
+                ['*****COPY*****'],
+                [printer.size],
+                [ColumnAliment.CENTER],
+                [`${COMMANDS.TEXT_FORMAT.TXT_2HEIGHT}${BOLD_ON}`]
+              );
+              NetPrinter.printText(
+                printer.size === '30' ? dividerLine58mm : dividerLine80mm
+              );
+
+              NetPrinter.printColumnsText(
+                [jobDate],
+                [printer.size],
+                [ColumnAliment.CENTER],
+                [`${COMMANDS.TEXT_FORMAT.TXT_2HEIGHT}${BOLD_ON}`]
+              );
+
+              NetPrinter.printColumnsText(
+                subHeader,
+                [10, Number(printer.size) / 2],
+                [ColumnAliment.LEFT, ColumnAliment.LEFT],
+                [
+                  `${COMMANDS.TEXT_FORMAT.TXT_2HEIGHT}${BOLD_ON}`,
+                  `${COMMANDS.TEXT_FORMAT.TXT_2HEIGHT}${BOLD_ON}`,
+                ]
+              );
+
+              NetPrinter.printText(
+                `${COMMANDS.TEXT_FORMAT.TXT_2HEIGHT}${BOLD_ON}${
+                  user && user?.username
+                }${BOLD_OFF}`
+              );
+
+              NetPrinter.printText(
+                printer.size === '30' ? dividerLine58mm : dividerLine80mm
+              );
+
+              _.orderBy(orderPrint, 'category.dataLevel').map((i) => {
+                let wordTakeAway = ``;
+                if (
+                  i.makeTakeAway ||
+                  order.orderType === 'take-away' ||
+                  order.orderType === 'partner'
+                ) {
+                  wordTakeAway = '(TA)';
+                }
+
+                let columnSize = [];
+
+                if (printer.size === '30') {
+                  columnSize = [5, 15, 10];
+                } else if (printer.size === '46') {
+                  columnSize = [6, 20, 20];
+                }
+
+                NetPrinter.printColumnsText(
+                  [
+                    `${i.quantity} - ${wordTakeAway}`,
+                    i.product.name,
+                    i.protein ? i.protein.name : '',
+                  ],
+                  columnSize,
+                  [ColumnAliment.LEFT, ColumnAliment.LEFT, ColumnAliment.RIGHT],
+                  [`${BOLD_ON}`, ``, ``]
+                );
+
+                if (i.setmenus.length > 0) {
+                  NetPrinter.printColumnsText(
+                    ['Set Menu'],
+                    [printer.size],
+                    [ColumnAliment.LEFT],
+                    [`${BOLD_ON}`]
+                  );
+                  i.setmenus.map((sm) => {
+                    NetPrinter.printColumnsText(
+                      [
+                        `- ${sm.product?.name}`,
+                        sm.protein ? sm.protein?.name : '',
+                      ],
+                      [15, 15],
+                      [ColumnAliment.LEFT, ColumnAliment.RIGHT],
+                      [`${BOLD_ON}`, ``]
+                    );
+                  });
+                }
+              });
+
+              NetPrinter.printText(
+                printer.size === '30' ? dividerLine58mm : dividerLine80mm
+              );
+            } catch (error) {
+              Toast.show({
+                text: error.message,
+                buttonText: 'Okay',
+                type: 'danger',
+              });
+            }
+          },
+        },
+      ]);
+    }
+  };
+
+  /*
+  const printOrder = () => {
     // const orderDetail = _.filter(order.orderDetails, ['makePrinted', false]);
     const orderDetail = order.orderDetails;
     if (orderDetail.length > 0) {
@@ -371,6 +612,7 @@ const CartScreen = ({ navigation }) => {
       });
     }
   };
+  */
 
   return (
     <SafeAreaView forceInset={{ bottom: 'never' }} style={{ flex: 1 }}>
